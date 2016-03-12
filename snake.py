@@ -5,6 +5,7 @@ import subprocess
 ABS_PATH = os.path.realpath(__file__)
 
 class Dir:
+    """A helpful wrapper around a group of files in a common directory."""
     def __init__(self, dirname, recursive=False):
         """Constructs a directory target from the specified dirname. Every
         file in the directory is then treated as a dependency. The optional
@@ -23,7 +24,7 @@ class Dir:
             raise Exception('specified directory does not exist')
 
         self.maps = []
-        self.depenencies = []
+        self.dependencies = []
         #self.contents = [] # raw filename strings
         #self.targets = {} # for files that became targets
 
@@ -53,9 +54,9 @@ class Dir:
         number of wildcards as in (0 or 1). Only dependencies of this directory
         which are matched by a call to map() will be built on build()
         """
-        self.maps.append({"in":input, "out":out})
-        #if "*" in out and "*" not in input:
-        #    raise Exception("In must have * if out has *")
+        if "*" in out and "*" not in input:
+            raise Exception("In must have * if out has *")
+        self.maps.append({"in":input.replace("*", "(.+)"), "out":out})
         #for f in self.contents:
         #    matches = re.search(input.replace("*", "(.)+"), f)
         #    if matches:
@@ -91,14 +92,43 @@ class Dir:
         here, a tool must have been previously specified by a call to tool().
         Only dependencies which are bound to an output will be built.
         """
-        #TODO
+        if tool:
+            self.tool = tool
         # contents = scan dir
-        # contents[i] = Target if contents[i] matches, else Leaf
-        # for each target in contents:
-        #    for each d in deps:
-        #        target.depends(d)
-        # build c
-        pass
+        contents = self._get_files()
+        # contents[i] = Target if contents[i] matches a mapping
+        for mapping in self.maps:
+            for i in range(len(contents)):
+                matches = re.search(mapping["in"], contents[i])
+                if matches:
+                    contents[i] = Target(mapping['out'].replace("*", matches.group(1)))
+
+        for i in range(len(contents)):
+            # everything that is not a Target becomes a Leaf
+            if not isinstance(contents[i], Target):
+                contents[i] = Leaf(contents[i])
+            # everything that is a Target gets dependencies
+            else:
+                for dep in self.depenencies:
+                    contents[i].depends_on(dep)
+
+        return [res.build() if res.has_tool() else res.build(self.tool) for res in contents]
+
+    def _get_files(self):
+        """Returns list of files in this Dir."""
+        contents = []
+        if self.recursive:
+            for _, _, files in os.walk(self.path):
+                for filename in files:
+                    if filename[0] != '.':
+                        contents.append(filename)
+        else:
+            _, _, files = next(os.walk(self.path))
+            for filename in files:
+                if filename[0] != ".":
+                    contents.append(filename)
+        return contents
+
 
 class Leaf:
     """Wrapper class for files"""
@@ -192,7 +222,7 @@ class Tool:
         self.flags = fl
 
     def command(self):
-        return command
+        return self.command
 
     def flags(self):
-        return flags
+        return self.flags
