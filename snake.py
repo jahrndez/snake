@@ -4,6 +4,7 @@ import subprocess
 
 ABS_PATH = os.path.realpath(__file__)
 
+
 class Dir:
     def __init__(self, dirname, recursive=False):
         """Constructs a directory target from the specified dirname. Every
@@ -23,27 +24,20 @@ class Dir:
             raise Exception('specified directory does not exist')
 
         self.maps = []
-        self.depenencies = []
-        #self.contents = [] # raw filename strings
-        #self.targets = {} # for files that became targets
+        self.dependencies = []
+        # self.contents = [] # raw filename strings
+        # self.targets = {} # for files that became targets
 
-        #if recursive:
+        # if recursive:
         #    for root, dirs, files in os.walk(self.path):
         #        for filename in files:
         #            if filename[0] != '.':
         #                self.contents.append(filename)
-        #else:
+        # else:
         #    root, dirs, files = next(os.walk(self.path))
         #    for filename in files:
         #        if filename[0] != ".":
         #            self.contents.append(filename)
-
-
-    def __getitem__(self, key):
-        """Returns the target with the specified name if this directory has it
-        in its dependencies, throws an error otherwise.
-        """
-        return self.targets[name]
 
     def map(self, input, out):
         """Sets the output of this directory by creating a set of in->out
@@ -53,10 +47,10 @@ class Dir:
         number of wildcards as in (0 or 1). Only dependencies of this directory
         which are matched by a call to map() will be built on build()
         """
-        self.maps.append({"in":input, "out":out})
-        #if "*" in out and "*" not in input:
+        self.maps.append({"in": input, "out": out})
+        # if "*" in out and "*" not in input:
         #    raise Exception("In must have * if out has *")
-        #for f in self.contents:
+        # for f in self.contents:
         #    matches = re.search(input.replace("*", "(.)+"), f)
         #    if matches:
         #        self.targets[f] = Target(out.replace("*", matches.group(1)))
@@ -91,7 +85,7 @@ class Dir:
         here, a tool must have been previously specified by a call to tool().
         Only dependencies which are bound to an output will be built.
         """
-        #TODO
+        # TODO
         # contents = scan dir
         # contents[i] = Target if contents[i] matches, else Leaf
         # for each target in contents:
@@ -99,6 +93,7 @@ class Dir:
         #        target.depends(d)
         # build c
         pass
+
 
 class Leaf:
     """Wrapper class for files"""
@@ -112,6 +107,7 @@ class Leaf:
     def build(self):
         return self.filename
 
+
 class Target:
     """Root of dependency tree."""
 
@@ -120,10 +116,12 @@ class Target:
         """
         self.out = out
         self.dependencies = []
+        self.tool = None
 
     def out(self, out):
         """Sets this target's output. This will be the final artifact after
         build() is invoked on this target.
+        :param out: specifies the filename of the output
         """
         self.out = out
 
@@ -141,7 +139,9 @@ class Target:
                 raise Exception('dependency must be one of: Target, Dir, or string')
 
     def tool(self, tool):
-        """Specify the build tool for this target."""
+        """Specify the build tool for this target.
+        :param tool: program with which to build this Target
+        """
         self.tool = tool
 
     def has_tool(self):
@@ -155,8 +155,8 @@ class Target:
         here, a tool must have been specified previously by a call to tool().
         This target's output must have been previously set either in the
         constructor or in map().
+        :param tool: program with which to build this Target
         """
-        #TODO finish
         if self.out is None:
             raise Exception('out was never specified')
         if tool is not None:
@@ -168,15 +168,22 @@ class Target:
         command = self.tool.command()
         in_string = " ".join(ins)
 
-        if command.contains("{flags}"):
+        if self.tool.flags is None:
+            command = command.format(inp=in_string, out=self.out)
+        elif command.contains("{flags}"):
             command = command.format(inp=in_string, out=self.out, flags=" ".join(self.tool.flags()))
         else:
             command = command.format(inp=in_string, out=self.out) + " " + " ".join(self.tool.flags())
 
-        #TODO finish
+        try:
+            subprocess.check_call(command.split(" "))
+        except subprocess.CalledProcessError:
+            raise Exception('build failed')
+
+        return self.out
+
 
 class Tool:
-
     def __init__(self, command):
         """The specified 'command' will be the actual program executed. The
         string must contain 2 mandatory placeholders \{inp\} and \{out\} and may
@@ -186,13 +193,14 @@ class Tool:
         flags will be appended to the end.
         """
         self.command = command.strip()
+        self.flags = None
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
         self.flags = fl
 
     def command(self):
-        return command
+        return self.command
 
     def flags(self):
-        return flags
+        return self.flags
