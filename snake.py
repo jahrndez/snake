@@ -99,15 +99,15 @@ class Dir:
         """Returns list of files in this Dir."""
         contents = []
         if self.recursive:
-            for _, _, files in os.walk(self.path):
+            for dirname, _, files in os.walk(self.path):
                 for filename in files:
                     if filename[0] != '.':
-                        contents.append(filename)
+                        contents.append(os.path.join(dirname, filename))
         else:
-            _, _, files = next(os.walk(self.path))
+            dirname, _, files = next(os.walk(self.path))
             for filename in files:
                 if filename[0] != ".":
-                    contents.append(filename)
+                    contents.append(os.path.join(dirname, filename))
         return contents
 
 

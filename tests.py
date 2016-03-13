@@ -12,7 +12,10 @@ class TestBasic(unittest.TestCase):
         for root, dirs, files in os.walk(bin):
             for filename in files:
                 if filename[0] != '.':
-                    os.remove(os.path.join(bin, filename))
+                    try:
+                        os.remove(os.path.join(bin, filename))
+                    except:
+                        pass
 
     def test_single_c_file(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
@@ -46,7 +49,7 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'bin/dir1/a.o'
         path = TEST_FILES_DIR + 'src/dir1'
         dir1 = snake.Dir(path,True)
-        dir1.map('*.c', '*.o')
+        dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'bin/dir1/*.o')
         dir1.depends_on(TEST_FILES_DIR + 'src/basic.c')
         my_tool = snake.Tool("gcc {inp} -o {out}")
         dir1.tool(my_tool)
