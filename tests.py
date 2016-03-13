@@ -7,6 +7,8 @@ TEST_FILES_DIR = 'test_files/'
 def make_dirs():
     if not os.path.exists(TEST_FILES_DIR + 'bin'):
         os.makedirs(TEST_FILES_DIR + 'bin')
+    if not os.path.exists(TEST_FILES_DIR + 'bin/use_cases'):
+        os.makedirs(TEST_FILES_DIR + 'bin/use_cases')
     if not os.path.exists(TEST_FILES_DIR + 'obj'):
         os.makedirs(TEST_FILES_DIR + 'obj')
     for root, _, _ in os.walk(TEST_FILES_DIR + 'src'):
