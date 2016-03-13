@@ -71,6 +71,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(os.path.isfile(out_file))
 
 
+
 class TestDirs(unittest.TestCase):
     def setUp(self):
         # clean
@@ -95,6 +96,14 @@ class TestDirs(unittest.TestCase):
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
+
+    def test_single_dir_deps_single_file(self):
+
+    def test_single_dir_deps_single_dir(self):
+
+    def test_single_dir_deps_single_dir_and_file(self):
+
+    def test_single_file_deps_single_dir_and_file(self):
 
 if __name__ == '__main__':
     unittest.main()
