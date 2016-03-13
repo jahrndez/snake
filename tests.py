@@ -113,10 +113,15 @@ class TestUseCases(unittest.TestCase):
         clean()
 
     def test_advanced(self):
-        clang = snake.Tool("clang {in} -o {out}").flags("-v")
-        op_clang = snake.Tool("clang {in} -o {out}").flags("-O3", "-v")
-        util = snake.Dir('src/use_cases/util')
+        clang = snake.Tool("clang {inp} -o {out}")
+        clang.flags("-v")
+        op_clang = snake.Tool("clang {inp} -o {out}")
+        op_clang.flags("-O3", "-v")
+        util_clang = snake.Tool("clang -c {inp} -o {out}")
+
+        util = snake.Dir(TEST_FILES_DIR + 'src/use_cases/util')
         util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
+        util.tool(util_clang)
 
         main_out = TEST_FILES_DIR + 'bin/use_cases/main'
         main_prog = snake.Target(main_out)
