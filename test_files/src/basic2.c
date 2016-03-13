@@ -1,2 +1,2 @@
-void non_main() {
+void basic2() {
 }
