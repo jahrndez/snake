@@ -227,7 +227,7 @@ class Target:
 
 class Tool:
     """Represents a command-line tool command and its flags. Example, gcc."""
-    def __init__(self, command):
+    def __init__(self, command, flags=None):
         """The specified 'command' will be the actual program executed. The
         string must contain 2 mandatory placeholders {inp} and {out} and may
         contain a third optional placeholder {flags}. At build-time, these
@@ -239,7 +239,11 @@ class Tool:
             raise Exception('command specified to Tool must have {inp} and {out}')
 
         self._command = command.strip()
-        self._flags = []
+
+        if flags is None:
+            self._flags = []
+        else:
+            self._flags = flags
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
