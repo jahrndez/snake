@@ -4,20 +4,21 @@ import os
 
 TEST_FILES_DIR = 'test_files/'
 
+#def make_dirs():
+
 
 def clean():
-    # clean
-        bin_ = TEST_FILES_DIR + 'bin/'
-        out_ = TEST_FILES_DIR + 'obj/'
-        for root, _, files in os.walk(bin_):
-            for filename in files:
-                if filename[0] != '.':
-                    os.remove(os.path.join(root, filename))
+    bin_ = TEST_FILES_DIR + 'bin/'
+    out_ = TEST_FILES_DIR + 'obj/'
+    for root, _, files in os.walk(bin_):
+        for filename in files:
+            if filename[0] != '.':
+                os.remove(os.path.join(root, filename))
 
-        for root, _, files in os.walk(out_):
-            for filename in files:
-                if filename[0] != '.':
-                    os.remove(os.path.join(root, filename))
+    for root, _, files in os.walk(out_):
+        for filename in files:
+            if filename[0] != '.':
+                os.remove(os.path.join(root, filename))
 
 
 class TestBasic(unittest.TestCase):
@@ -75,7 +76,7 @@ class TestDirs(unittest.TestCase):
         clean()
 
     def test_single_dir(self):
-        out_file = TEST_FILES_DIR + 'obj/dir1/a.o'
+        out_file = TEST_FILES_DIR + 'obj/dir1/c.o'
         path = TEST_FILES_DIR + 'src/dir1/'
         dir1 = snake.Dir(path)
         dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'obj/dir1/*.o')
@@ -85,12 +86,16 @@ class TestDirs(unittest.TestCase):
         self.assertTrue(os.path.isfile(out_file))
 
     def test_single_dir_deps_single_file(self):
+        pass
 
     def test_single_dir_deps_single_dir(self):
+        pass
 
     def test_single_dir_deps_single_dir_and_file(self):
+        pass
 
     def test_single_file_deps_single_dir_and_file(self):
+        pass
 
 
 class TestUseCases(unittest.TestCase):

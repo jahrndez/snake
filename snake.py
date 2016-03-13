@@ -9,7 +9,7 @@ ABS_DIR_PATH = os.path.realpath(os.path.dirname(__main__.__file__))
 
 class Dir:
     """A helpful wrapper around a group of files in a common directory."""
-    def __init__(self, dirname, recursive=False):
+    def __init__(self, dirname, recursive=False, tool=None, deps=()):
         """Constructs a directory target from the specified dirname. Every
         file in the directory is then treated as a dependency. The optional
         recursive specifies whether any directories within this directory
@@ -29,6 +29,10 @@ class Dir:
         self.maps = []
         self.dependencies = []
         self._tool = None
+
+        # handle optional short-cut args
+        self.tool(tool)
+        self.depends_on(*deps)
 
     def map(self, inp, out):
         """Sets the output of this directory by creating a set of in->out
