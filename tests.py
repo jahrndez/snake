@@ -8,9 +8,11 @@ TEST_FILES_DIR = 'test_files/'
 class TestBasic(unittest.TestCase):
     def setUp(self):
         # clean
-        for root, dirs, files in os.walk(TEST_FILES_DIR + 'bin/'):
+        bin = TEST_FILES_DIR + 'bin/'
+        for root, dirs, files in os.walk(bin):
             for filename in files:
-                os.remove(os.path.join(TEST_FILES_DIR, filename))
+                if filename[0] != '.':
+                    os.remove(os.path.join(bin, filename))
 
     def test_single_c_file(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
@@ -42,7 +44,7 @@ class TestBasic(unittest.TestCase):
 
     def test_single_folder_deps_single_folder(self):
         out_file = TEST_FILES_DIR + 'bin/dir1/a.o'
-        path = TEST_FILES_DIR + 'dir1'
+        path = TEST_FILES_DIR + 'src/dir1'
         dir1 = snake.Dir(path,True)
         dir1.map('*.c', '*.o')
         dir1.depends_on(TEST_FILES_DIR + 'src/basic.c')
