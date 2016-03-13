@@ -44,5 +44,15 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
+    def test_flags_no_placeholder(self):
+        out_file = TEST_FILES_DIR + 'basic'
+        target = snake.Target(out_file)
+        target.depends_on(TEST_FILES_DIR + 'basic.c')
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool.flags("-Wall")
+        target.tool(my_tool)
+        target.build()
+        self.assertTrue(os.path.isfile(out_file))
+
 if __name__ == '__main__':
     unittest.main()
