@@ -31,17 +31,6 @@ class Dir:
         self.dependencies = []
         self._tool = None
 
-        # if recursive:
-        #    for root, dirs, files in os.walk(self.path):
-        #        for filename in files:
-        #            if filename[0] != '.':
-        #                self.contents.append(filename)
-        # else:
-        #    root, dirs, files = next(os.walk(self.path))
-        #    for filename in files:
-        #        if filename[0] != ".":
-        #            self.contents.append(filename)
-
     def map(self, inp, out):
         """Sets the output of this directory by creating a set of in->out
         relationships. in is a string with at most one wildcard, and specifies
@@ -53,9 +42,6 @@ class Dir:
         if "*" in out and "*" not in input:
             raise Exception("In must have * if out has *")
         self.maps.append({"in":inp.replace("*", "(.+)"), "out":out})
-        #for f in self.contents:
-        #    if matches:
-        #        self.targets[f] = Target(out.replace("*", matches.group(1)))
 
     def depends_on(self, *deps):
         """Specifies the dependencies of this directory, i.e. its input in the
@@ -123,7 +109,6 @@ class Dir:
                 if filename[0] != ".":
                     contents.append(filename)
         return contents
-
 
 
 class Leaf:
