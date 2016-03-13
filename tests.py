@@ -115,17 +115,17 @@ class TestUseCases(unittest.TestCase):
     def test_advanced(self):
         clang = snake.Tool("clang {in} -o {out}").flags("-v")
         op_clang = snake.Tool("clang {in} -o {out}").flags("-O3", "-v")
-        util = snake.Dir('src/util')
-        util.map(TEST_FILES_DIR + 'src/util/*.c', TEST_FILES_DIR + 'obj/util/*.o')
+        util = snake.Dir('src/use_cases/util')
+        util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
 
-        main_out = TEST_FILES_DIR + 'bin/main'
+        main_out = TEST_FILES_DIR + 'bin/use_cases/main'
         main_prog = snake.Target(main_out)
-        main_prog.depends_on(TEST_FILES_DIR + 'src/basic.c')
+        main_prog.depends_on(TEST_FILES_DIR + 'src/use_cases/main.c')
         main_prog.depends_on(util)
 
-        test_out = TEST_FILES_DIR + 'bin/test'
+        test_out = TEST_FILES_DIR + 'bin/use_cases/test'
         test_prog = snake.Target(test_out)
-        test_prog.depends_on(TEST_FILES_DIR + 'src/basic2.c')
+        test_prog.depends_on(TEST_FILES_DIR + 'src/use_cases/test.c')
         test_prog.depends_on(util)
 
         main_prog.build(op_clang)
