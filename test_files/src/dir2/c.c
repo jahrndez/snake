@@ -1,2 +1,5 @@
-void dir2c() {
+#include <stdio.h>
+
+int main() {
+    printf("Basic c file\n");
 }
