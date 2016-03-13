@@ -128,7 +128,7 @@ class Leaf:
 class Target:
     """Root of dependency tree."""
 
-    def __init__(self, out=None):
+    def __init__(self, out=None, deps=(), tool=None):
         """Constructs a new target object, with an output optionally specified.
         """
         if out == None or out[0] == "/":
@@ -137,6 +137,10 @@ class Target:
             self._out = os.path.join(ABS_DIR_PATH, out)
         self.dependencies = []
         self._tool = None
+
+        # Handle short-cut optional args
+        self.depends_on(deps)
+        self.tool(tool)
 
     def out(self, out):
         """Sets this target's output. This will be the final artifact after
