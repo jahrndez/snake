@@ -4,6 +4,7 @@ import os
 
 TEST_FILES_DIR = 'test_files/'
 
+
 def make_dirs():
     if not os.path.exists(TEST_FILES_DIR + 'bin'):
         os.makedirs(TEST_FILES_DIR + 'bin')
@@ -14,6 +15,7 @@ def make_dirs():
             obj_dir = root.replace('/src/', '/obj/')
             if not os.path.exists(obj_dir):
                 os.makedirs(obj_dir)
+
 
 def clean():
     bin_ = TEST_FILES_DIR + 'bin/'
