@@ -70,13 +70,13 @@ class Dir:
 
     def tool(self, tool):
         """Specify the build tool for this Dir."""
-        self.tool = tool
+        self._tool = tool
 
     def has_tool(self):
         """Returns whether a build tool has been previously defined for this
         Dir.
         """
-        return self.tool is not None
+        return self._tool is not None
 
     def build(self, tool=None):
         """Build this directory with the specified tool. If no tool is specified
@@ -84,7 +84,7 @@ class Dir:
         Only dependencies which are bound to an output will be built.
         """
         if tool:
-            self.tool = tool
+            self._tool = tool
         # contents = scan dir
         contents = self._get_files()
         # contents[i] = Target if contents[i] matches a mapping
@@ -100,10 +100,10 @@ class Dir:
                 contents[i] = Leaf(contents[i])
             # everything that is a Target gets dependencies
             else:
-                for dep in self.depenencies:
+                for dep in self.dependencies:
                     contents[i].depends_on(dep)
 
-        return [res.build() if res.has_tool() else res.build(self.tool) for res in contents]
+        return [res.build() if res.has_tool() else res.build(self._tool) for res in contents]
 
     def _get_files(self):
         """Returns list of files in this Dir."""
@@ -141,16 +141,16 @@ class Target:
     def __init__(self, out=None):
         """Constructs a new target object, with an output optionally specified.
         """
-        self.out = out
+        self._out = out
         self.dependencies = []
-        self.tool = None
+        self._tool = None
 
     def out(self, out):
         """Sets this target's output. This will be the final artifact after
         build() is invoked on this target.
         :param out: specifies the filename of the output
         """
-        self.out = out
+        self._out = out
 
     def depends_on(self, *deps):
         """Specify the dependencies of this target."""
@@ -169,13 +169,13 @@ class Target:
         """Specify the build tool for this target.
         :param tool: program with which to build this Target
         """
-        self.tool = tool
+        self._tool = tool
 
     def has_tool(self):
         """Returns whether a build tool has been previously defined for this
         target.
         """
-        return self.tool is not None
+        return self._tool is not None
 
     def build(self, tool=None):
         """Build this target with the specified tool. If no tool is specified
@@ -187,20 +187,20 @@ class Target:
         if self.out is None:
             raise Exception('out was never specified')
         if tool is not None:
-            self.tool = tool
-        if self.tool is None:
+            self._tool = tool
+        if self._tool is None:
             raise Exception('no tool specified for target')
 
-        ins = [dep.build() if dep.has_tool() else dep.build(self.tool) for dep in self.dependencies]
-        command = self.tool.command()
+        ins = [dep.build() if dep.has_tool() else dep.build(self._tool) for dep in self.dependencies]
+        command = self._tool.command()
         in_string = " ".join(ins)
 
-        if self.tool.flags is None:
+        if self._tool.flags is None:
             command = command.format(inp=in_string, out=self.out)
         elif command.contains("{flags}"):
-            command = command.format(inp=in_string, out=self.out, flags=" ".join(self.tool.flags()))
+            command = command.format(inp=in_string, out=self.out, flags=" ".join(self._tool.flags()))
         else:
-            command = command.format(inp=in_string, out=self.out) + " " + " ".join(self.tool.flags())
+            command = command.format(inp=in_string, out=self.out) + " " + " ".join(self._tool.flags())
 
         try:
             subprocess.check_call(command.split(" "))
@@ -211,23 +211,27 @@ class Target:
 
 
 class Tool:
+    """Represents a command-line tool command and its flags. Example, gcc."""
     def __init__(self, command):
         """The specified 'command' will be the actual program executed. The
-        string must contain 2 mandatory placeholders \{inp\} and \{out\} and may
-        contain a third optional placeholder \{flags\}. At build-time, these
+        string must contain 2 mandatory placeholders {inp} and {out} and may
+        contain a third optional placeholder {flags}. At build-time, these
         will be replaced with the Target's or Dir's input and output, as well as
-        with this tool's flags. If the \{flags\} placeholder is omitted, any
+        with this tool's flags. If the {flags} placeholder is omitted, any
         flags will be appended to the end.
         """
-        self.command = command.strip()
-        self.flags = None
+        self._command = command.strip()
+        self._flags = None
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
-        self.flags = fl
+        self._flags = fl
 
     def command(self):
-        return self.command
+        """Return the current command string."""
+        return self._command
 
+    @flags.getter
     def flags(self):
-        return self.flags
+        """Return list of flags this command uses."""
+        return self._flags
