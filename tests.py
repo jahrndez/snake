@@ -66,5 +66,7 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
+    def test_single_folder_deps_single_folder(self):
+
 if __name__ == '__main__':
     unittest.main()
