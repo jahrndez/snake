@@ -44,5 +44,16 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
+    def test_single_folder_deps_single_folder(self):
+        out_file = TEST_FILES_DIR + 'dir1/a.o'
+        path = TEST_FILES_DIR + 'dir1'
+        dir1 = snake.Dir(path,True)
+        dir1.map('*.c','*.o')
+        dir1.depends_on(TEST_FILES_DIR + 'basic.c')
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        dir1.tool(my_tool)
+        dir1.build()
+        self.assertTrue(os.path.isfile(TEST_FILES_DIR + 'dir1/a.o'))
+
 if __name__ == '__main__':
     unittest.main()
