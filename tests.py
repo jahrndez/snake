@@ -5,32 +5,27 @@ import os
 TEST_FILES_DIR = 'test_files/'
 
 
-def remove_files(prefix, files):
-    for filename in files:
-        if filename[0] != '.':
-            os.remove(os.path.join(prefix, filename))
-
-
-class TestBasic(unittest.TestCase):
-    def setUp(self):
-        # clean
+def clean():
+    # clean
         bin_ = TEST_FILES_DIR + 'bin/'
         out_ = TEST_FILES_DIR + 'obj/'
         for root, _, files in os.walk(bin_):
             for filename in files:
                 if filename[0] != '.':
-                    try:
-                        os.remove(os.path.join(root, filename))
-                    except:
-                        pass
+                    os.remove(os.path.join(root, filename))
 
         for root, _, files in os.walk(out_):
             for filename in files:
                 if filename[0] != '.':
-                    try:
-                        os.remove(os.path.join(root, filename))
-                    except:
-                        pass
+                    os.remove(os.path.join(root, filename))
+
+
+class TestBasic(unittest.TestCase):
+    def setUp(self):
+        clean()
+
+    def tearDown(self):
+        clean()
 
     def test_single_c_file(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
@@ -73,18 +68,10 @@ class TestBasic(unittest.TestCase):
 
 class TestDirs(unittest.TestCase):
     def setUp(self):
-        # clean
-        bin_ = TEST_FILES_DIR + 'bin/'
-        out_ = TEST_FILES_DIR + 'obj/'
-        for root, _, files in os.walk(bin_):
-            for filename in files:
-                if filename[0] != '.':
-                    os.remove(os.path.join(root, filename))
+        clean()
 
-        for root, _, files in os.walk(out_):
-            for filename in files:
-                if filename[0] != '.':
-                    os.remove(os.path.join(root, filename))
+    def tearDown(self):
+        clean()
 
     def test_single_dir(self):
         out_file = TEST_FILES_DIR + 'obj/dir1/a.o'
@@ -95,6 +82,15 @@ class TestDirs(unittest.TestCase):
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
+
+
+class TestUseCases(unittest.TestCase):
+    def setUp(self):
+        clean()
+
+    def tearDown(self):
+        clean()
+
 
 if __name__ == '__main__':
     unittest.main()
