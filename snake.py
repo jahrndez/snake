@@ -7,6 +7,17 @@ import __main__
 ABS_DIR_PATH = os.path.realpath(os.path.dirname(__main__.__file__))
 
 
+def flatten(lst):
+    res = []
+    for item in lst:
+        if isinstance(item, str):
+            res.append(item)
+        if isinstance(item, list):
+            res += item
+
+    return res
+
+
 class Dir:
     """A helpful wrapper around a group of files in a common directory."""
     def __init__(self, dirname, recursive=False, tool=None, deps=()):
@@ -208,7 +219,7 @@ class Target:
 
         if not run_command and any(os.path.getmtime(dep) > os.path.getmtime(self._out) for dep in ins):
             run_command = True
-
+        ins = flatten(ins)
         command = self._tool.command()
         in_string = " ".join(ins)
         command = command.format(inp=in_string, out=self._out)
