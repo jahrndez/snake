@@ -3,7 +3,8 @@ import os
 import re
 import subprocess
 
-ABS_PATH = os.path.realpath(__file__)
+# ABS_PATH = os.path.realpath(__file__)
+ABS_DIR_PATH = os.path.realpath(os.path.dirname(__file__))
 
 
 class Dir:
@@ -21,7 +22,7 @@ class Dir:
         if dirname[0] == "/":
             self.path = dirname
         else:
-            self.path = os.path.join(ABS_PATH, dirname)
+            self.path = os.path.join(ABS_DIR_PATH, dirname)
         if not os.path.isdir(self.path):
             raise Exception('specified directory does not exist')
 
@@ -66,7 +67,7 @@ class Dir:
                 if dep[0] == "/":
                     self.dependencies.append(dep)
                 else:
-                    self.dependencies.append(os.path.join(ABS_PATH, dep))
+                    self.dependencies.append(os.path.join(ABS_DIR_PATH, dep))
             else:
                 raise Exception('dependency must be one of: Target, Dir, or string')
 
@@ -163,7 +164,7 @@ class Target:
                 if dep[0] == "/":
                     self.dependencies.append(Leaf(dep))
                 else:
-                    self.dependencies.append(Leaf(os.path.join(ABS_PATH, dep)))
+                    self.dependencies.append(Leaf(os.path.join(ABS_DIR_PATH, dep)))
             else:
                 raise Exception('dependency must be one of: Target, Dir, or string')
 
@@ -197,7 +198,9 @@ class Target:
         command = self._tool.command()
         in_string = " ".join(ins)
 
-        command = command.format(inp=in_string, out=self.out)
+        command = command.format(inp=in_string, out=self._out)
+
+        print command
 
         try:
             subprocess.check_call(command.split(" "))
