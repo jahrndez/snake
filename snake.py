@@ -201,7 +201,7 @@ class Target:
 
         command = command.format(inp=in_string, out=self._out)
 
-        print command
+        print(command)
 
         # try:
         subprocess.check_call(command.split(" "))
