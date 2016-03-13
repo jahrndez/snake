@@ -1,3 +1,4 @@
 .idea/
 snake.pyc
-test_files/basic
+test_files/bin/
+test_files/out/
