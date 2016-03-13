@@ -39,7 +39,7 @@ class Dir:
         number of wildcards as in (0 or 1). Only dependencies of this directory
         which are matched by a call to map() will be built on build()
         """
-        if "*" in out and "*" not in input:
+        if "*" in out and "*" not in inp:
             raise Exception("In must have * if out has *")
         self.maps.append({"in":inp.replace("*", "(.+)"), "out":out})
 
@@ -192,8 +192,6 @@ class Target:
 
         command = command.format(inp=in_string, out=self._out)
 
-        print(command)
-
         # try:
         subprocess.check_call(command.split(" "))
         # except subprocess.CalledProcessError:
@@ -225,5 +223,5 @@ class Tool:
     def command(self):
         """Return the current command string."""
         if "{flags}" not in self._command:
-            self._command = self._command + " {flags}"
+            self._command += " {flags}"
         return self._command.format(flags=" ".join(self._flags), inp='{inp}', out='{out}').strip()
