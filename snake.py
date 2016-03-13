@@ -202,10 +202,10 @@ class Target:
 
         print command
 
-        try:
-            subprocess.check_call(command.split(" "))
-        except subprocess.CalledProcessError:
-            raise Exception('build failed')
+        # try:
+        subprocess.check_call(command.split(" "))
+        # except subprocess.CalledProcessError:
+        #     raise Exception('build failed')
 
         return self._out
 

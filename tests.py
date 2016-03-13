@@ -25,5 +25,24 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
+    def test_two_c_files(self):
+        out_file = TEST_FILES_DIR + 'basic'
+        target = snake.Target(out_file)
+        target.depends_on(TEST_FILES_DIR + 'basic.c', TEST_FILES_DIR + 'basic2.c')
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        target.tool(my_tool)
+        target.build()
+        self.assertTrue(os.path.isfile(out_file))
+
+    def test_basic_flags(self):
+        out_file = TEST_FILES_DIR + 'basic'
+        target = snake.Target(out_file)
+        target.depends_on(TEST_FILES_DIR + 'basic.c')
+        my_tool = snake.Tool("gcc {inp} {flags} {out}")
+        my_tool.flags("-o")
+        target.tool(my_tool)
+        target.build()
+        self.assertTrue(os.path.isfile(out_file))
+
 if __name__ == '__main__':
     unittest.main()
