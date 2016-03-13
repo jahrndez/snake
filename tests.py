@@ -4,8 +4,16 @@ import os
 
 TEST_FILES_DIR = 'test_files/'
 
-#def make_dirs():
-
+def make_dirs():
+    if not os.path.exists(TEST_FILES_DIR + 'bin'):
+        os.makedirs(TEST_FILES_DIR + 'bin')
+    if not os.path.exists(TEST_FILES_DIR + 'obj'):
+        os.makedirs(TEST_FILES_DIR + 'obj')
+    for root, _, _ in os.walk(TEST_FILES_DIR + 'src'):
+        if '/src/' in root:
+            obj_dir = root.replace('/src/', '/obj/')
+            if not os.path.exists(obj_dir):
+                os.makedirs(obj_dir)
 
 def clean():
     bin_ = TEST_FILES_DIR + 'bin/'
@@ -107,4 +115,5 @@ class TestUseCases(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    make_dirs()
     unittest.main()
