@@ -31,17 +31,6 @@ class Dir:
         self.dependencies = []
         self._tool = None
 
-        # if recursive:
-        #    for root, dirs, files in os.walk(self.path):
-        #        for filename in files:
-        #            if filename[0] != '.':
-        #                self.contents.append(filename)
-        # else:
-        #    root, dirs, files = next(os.walk(self.path))
-        #    for filename in files:
-        #        if filename[0] != ".":
-        #            self.contents.append(filename)
-
     def map(self, inp, out):
         """Sets the output of this directory by creating a set of in->out
         relationships. in is a string with at most one wildcard, and specifies
@@ -53,9 +42,6 @@ class Dir:
         if "*" in out and "*" not in inp:
             raise Exception("In must have * if out has *")
         self.maps.append({"in":inp.replace("*", "(.+)"), "out":out})
-        #for f in self.contents:
-        #    if matches:
-        #        self.targets[f] = Target(out.replace("*", matches.group(1)))
 
     def depends_on(self, *deps):
         """Specifies the dependencies of this directory, i.e. its input in the
@@ -125,9 +111,9 @@ class Dir:
         return contents
 
 
-
 class Leaf:
     """Wrapper class for files"""
+    #pylint: disable=missing-docstring,no-self-use
 
     def __init__(self, filename):
         self.filename = filename
@@ -142,7 +128,7 @@ class Leaf:
 class Target:
     """Root of dependency tree."""
 
-    def __init__(self, out=None):
+    def __init__(self, out=None, deps=(), tool=None):
         """Constructs a new target object, with an output optionally specified.
         """
         if out == None or out[0] == "/":
@@ -151,6 +137,10 @@ class Target:
             self._out = os.path.join(ABS_DIR_PATH, out)
         self.dependencies = []
         self._tool = None
+
+        # Handle short-cut optional args
+        self.depends_on(deps)
+        self.tool(tool)
 
     def out(self, out):
         """Sets this target's output. This will be the final artifact after
@@ -201,7 +191,8 @@ class Target:
         if self._tool is None:
             raise Exception('no tool specified for target')
 
-        ins = [dep.build() if dep.has_tool() else dep.build(self._tool) for dep in self.dependencies]
+        ins = [dep.build() if dep.has_tool() else dep.build(self._tool)
+               for dep in self.dependencies]
         command = self._tool.command()
         in_string = " ".join(ins)
 
@@ -233,7 +224,7 @@ class Tool:
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
-        self._flags += fl
+        self._flags.extend(fl)
 
     def command(self):
         """Return the current command string."""
