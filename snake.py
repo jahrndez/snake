@@ -84,7 +84,7 @@ class Dir:
             for i in range(len(contents)):
                 matches = re.search(mapping["in"], contents[i])
                 if matches:
-                    contents[i] = Target(mapping['out'].replace("*", matches.group(1)))
+                    contents[i] = Target(mapping['out'].replace("*", matches.group(1)), deps=[contents[i]])
 
         for i in range(len(contents)):
             # everything that is not a Target becomes a Leaf
