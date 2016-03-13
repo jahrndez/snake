@@ -113,6 +113,7 @@ class Dir:
 
 class Leaf:
     """Wrapper class for files"""
+    #pylint: disable=missing-docstring,no-self-use
 
     def __init__(self, filename):
         self.filename = filename
@@ -186,7 +187,8 @@ class Target:
         if self._tool is None:
             raise Exception('no tool specified for target')
 
-        ins = [dep.build() if dep.has_tool() else dep.build(self._tool) for dep in self.dependencies]
+        ins = [dep.build() if dep.has_tool() else dep.build(self._tool)
+               for dep in self.dependencies]
         command = self._tool.command()
         in_string = " ".join(ins)
 
@@ -218,7 +220,7 @@ class Tool:
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
-        self._flags += fl
+        self._flags.extend(fl)
 
     def command(self):
         """Return the current command string."""
