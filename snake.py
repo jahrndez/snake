@@ -221,17 +221,14 @@ class Tool:
             raise Exception('command specified to Tool must have {inp} and {out}')
 
         self._command = command.strip()
-        self._flags = None
+        self._flags = []
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
-        # TODO make this append to _flags
-        self._flags = fl
+        self._flags += fl
 
     def command(self):
         """Return the current command string."""
-        if "{flags}" in self._command:
-            return self._command.format(flags=" ".join(self._flags))
-        else:
-            return self._command + " " + " ".join(self._flags)
-
+        if "{flags}" not in self._command:
+            self._command = (self._command + " {flags}").strip()
+        return self._command.format(flags=" ".join(self._flags), inp='{inp}', out='{out}')
