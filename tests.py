@@ -42,7 +42,7 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
-    def test_single_folder_deps_single_folder(self):
+    def test_single_folder_deps_single_file(self):
         out_file = TEST_FILES_DIR + 'bin/dir1/a.o'
         path = TEST_FILES_DIR + 'src/dir1'
         dir1 = snake.Dir(path,True)
