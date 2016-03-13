@@ -145,7 +145,10 @@ class Target:
     def __init__(self, out=None):
         """Constructs a new target object, with an output optionally specified.
         """
-        self._out = out
+        if out == None or out[0] == "/":
+            self._out = out
+        else:
+            self._out = os.path.join(ABS_DIR_PATH, out)
         self.dependencies = []
         self._tool = None
 
@@ -154,7 +157,10 @@ class Target:
         build() is invoked on this target.
         :param out: specifies the filename of the output
         """
-        self._out = out
+        if out[0] == "/":
+            self._out = out
+        else:
+            self._out = os.path.join(ABS_DIR_PATH, out)
 
     def depends_on(self, *deps):
         """Specify the dependencies of this target."""
@@ -232,5 +238,5 @@ class Tool:
     def command(self):
         """Return the current command string."""
         if "{flags}" not in self._command:
-            self._command = (self._command + " {flags}").strip()
-        return self._command.format(flags=" ".join(self._flags), inp='{inp}', out='{out}')
+            self._command += " {flags}"
+        return self._command.format(flags=" ".join(self._flags), inp='{inp}', out='{out}').strip()
