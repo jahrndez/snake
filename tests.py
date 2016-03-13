@@ -40,7 +40,7 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'bin/basic'
         target = snake.Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = snake.Tool("gcc -c {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
@@ -49,7 +49,7 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'bin/basic'
         target = snake.Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c', TEST_FILES_DIR + 'src/basic2.c')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = snake.Tool("gcc -c {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
@@ -58,7 +58,7 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'bin/basic'
         target = snake.Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc {inp} {flags} {out}")
+        my_tool = snake.Tool("gcc -c {inp} {flags} {out}")
         my_tool.flags("-o")
         target.tool(my_tool)
         target.build()
@@ -68,7 +68,7 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'bin/basic'
         target = snake.Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = snake.Tool("gcc -c {inp} -o {out}")
         my_tool.flags("-Wall")
         target.tool(my_tool)
         target.build()
@@ -88,7 +88,7 @@ class TestDirs(unittest.TestCase):
         path = TEST_FILES_DIR + 'src/dir1/'
         dir1 = snake.Dir(path)
         dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'obj/dir1/*.o')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = snake.Tool("gcc -c {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
