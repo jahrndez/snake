@@ -2,9 +2,10 @@
 import os
 import re
 import subprocess
+import __main__
 
 # ABS_PATH = os.path.realpath(__file__)
-ABS_DIR_PATH = os.path.realpath(os.path.dirname(__file__))
+ABS_DIR_PATH = os.path.realpath(os.path.dirname(__main__.__file__))
 
 
 class Dir:
