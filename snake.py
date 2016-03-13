@@ -197,12 +197,7 @@ class Target:
         command = self._tool.command()
         in_string = " ".join(ins)
 
-        if self._tool.flags is None:
-            command = command.format(inp=in_string, out=self._out)
-        elif command.contains("{flags}"):
-            command = command.format(inp=in_string, out=self._out, flags=" ".join(self._tool.flags()))
-        else:
-            command = command.format(inp=in_string, out=self._out) + " " + " ".join(self._tool.flags())
+        command = command.format(inp=in_string, out=self.out)
 
         try:
             subprocess.check_call(command.split(" "))
@@ -222,6 +217,9 @@ class Tool:
         with this tool's flags. If the {flags} placeholder is omitted, any
         flags will be appended to the end.
         """
+        if "{inp}" not in command or "{out}" not in command:
+            raise Exception('command specified to Tool must have {inp} and {out}')
+
         self._command = command.strip()
         self._flags = None
 
@@ -232,4 +230,8 @@ class Tool:
 
     def command(self):
         """Return the current command string."""
-        return self._command
+        if "{flags}" in self._command:
+            return self._command.format(flags=" ".join(self._flags))
+        else:
+            return self._command + " " + " ".join(self._flags)
+

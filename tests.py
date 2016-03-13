@@ -4,10 +4,11 @@ import os
 
 TEST_FILES_DIR = 'test_files/'
 
+
 class TestBasic(unittest.TestCase):
     def setUp(self):
         out_files = ['basic']
-        #clean
+        # clean
         root, dirs, files = next(os.walk(TEST_FILES_DIR))
         for filename in files:
             if filename[0] != "." and filename.endswith('.o'):
@@ -19,6 +20,9 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'basic'
         target = snake.Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'basic.c')
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        target.tool(my_tool)
+        target.build()
         self.assertTrue(os.path.isfile(out_file))
 
 if __name__ == '__main__':
