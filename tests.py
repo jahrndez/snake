@@ -143,6 +143,26 @@ class TestUseCases(unittest.TestCase):
         self.assertTrue(os.path.isfile(main_out))
         self.assertTrue(os.path.isfile(test_out))
 
+
+class TestMemoization(unittest.TestCase):
+    def setUp(self):
+        clean()
+
+    def tearDown(self):
+        clean()
+
+    def test_timestamp_memoization(self):
+        out_file = TEST_FILES_DIR + 'bin/basic'
+        target = snake.Target(out_file)
+        target.depends_on(TEST_FILES_DIR + 'src/basic.c')
+        my_tool = snake.Tool("gcc -c {inp} -o {out}")
+        target.tool(my_tool)
+        target.build()
+        self.assertTrue(os.path.isfile(out_file))
+        time = os.path.getmtime(out_file)
+        target.build()
+        self.assertEqual(time, os.path.getmtime(out_file), "file was rebuilt")
+
 if __name__ == '__main__':
     make_dirs()
     unittest.main()
