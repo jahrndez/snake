@@ -1,3 +1,4 @@
+"""Snake Build Library."""
 import os
 import re
 import subprocess
@@ -26,6 +27,7 @@ class Dir:
 
         self.maps = []
         self.dependencies = []
+        self._tool = None
 
         # if recursive:
         #    for root, dirs, files in os.walk(self.path):
@@ -38,7 +40,7 @@ class Dir:
         #        if filename[0] != ".":
         #            self.contents.append(filename)
 
-    def map(self, input, out):
+    def map(self, inp, out):
         """Sets the output of this directory by creating a set of in->out
         relationships. in is a string with at most one wildcard, and specifies
         all files to which this rule will apply. out is a string that specifies
@@ -48,7 +50,7 @@ class Dir:
         """
         if "*" in out and "*" not in input:
             raise Exception("In must have * if out has *")
-        self.maps.append({"in":input.replace("*", "(.+)"), "out":out})
+        self.maps.append({"in":inp.replace("*", "(.+)"), "out":out})
         #for f in self.contents:
         #    if matches:
         #        self.targets[f] = Target(out.replace("*", matches.group(1)))
@@ -184,7 +186,7 @@ class Target:
         constructor or in map().
         :param tool: program with which to build this Target
         """
-        if self.out is None:
+        if self._out is None:
             raise Exception('out was never specified')
         if tool is not None:
             self._tool = tool
@@ -196,18 +198,18 @@ class Target:
         in_string = " ".join(ins)
 
         if self._tool.flags is None:
-            command = command.format(inp=in_string, out=self.out)
+            command = command.format(inp=in_string, out=self._out)
         elif command.contains("{flags}"):
-            command = command.format(inp=in_string, out=self.out, flags=" ".join(self._tool.flags()))
+            command = command.format(inp=in_string, out=self._out, flags=" ".join(self._tool.flags()))
         else:
-            command = command.format(inp=in_string, out=self.out) + " " + " ".join(self._tool.flags())
+            command = command.format(inp=in_string, out=self._out) + " " + " ".join(self._tool.flags())
 
         try:
             subprocess.check_call(command.split(" "))
         except subprocess.CalledProcessError:
             raise Exception('build failed')
 
-        return self.out
+        return self._out
 
 
 class Tool:
@@ -225,13 +227,9 @@ class Tool:
 
     def flags(self, *fl):
         """Options specified when running this tool. One flag per argument."""
+        # TODO make this append to _flags
         self._flags = fl
 
     def command(self):
         """Return the current command string."""
         return self._command
-
-    @flags.getter
-    def flags(self):
-        """Return list of flags this command uses."""
-        return self._flags
