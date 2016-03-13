@@ -1,2 +1,2 @@
-
-int foo() { return 1; }
+void dir1b() {
+}
