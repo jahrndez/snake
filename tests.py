@@ -4,6 +4,7 @@ import os
 
 TEST_FILES_DIR = 'test_files/'
 
+
 def make_dirs():
     if not os.path.exists(TEST_FILES_DIR + 'bin'):
         os.makedirs(TEST_FILES_DIR + 'bin')
@@ -14,6 +15,7 @@ def make_dirs():
             obj_dir = root.replace('/src/', '/obj/')
             if not os.path.exists(obj_dir):
                 os.makedirs(obj_dir)
+
 
 def clean():
     bin_ = TEST_FILES_DIR + 'bin/'
@@ -73,7 +75,6 @@ class TestBasic(unittest.TestCase):
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
-
 
 
 class TestDirs(unittest.TestCase):
@@ -137,6 +138,32 @@ class TestUseCases(unittest.TestCase):
     def tearDown(self):
         clean()
 
+    def test_advanced(self):
+        clang = snake.Tool("clang {inp} -o {out}")
+        clang.flags("-v")
+        op_clang = snake.Tool("clang {inp} -o {out}")
+        op_clang.flags("-O3", "-v")
+        util_clang = snake.Tool("clang -c {inp} -o {out}")
+
+        util = snake.Dir(TEST_FILES_DIR + 'src/use_cases/util')
+        util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
+        util.tool(util_clang)
+
+        main_out = TEST_FILES_DIR + 'bin/use_cases/main'
+        main_prog = snake.Target(main_out)
+        main_prog.depends_on(TEST_FILES_DIR + 'src/use_cases/main.c')
+        main_prog.depends_on(util)
+
+        test_out = TEST_FILES_DIR + 'bin/use_cases/test'
+        test_prog = snake.Target(test_out)
+        test_prog.depends_on(TEST_FILES_DIR + 'src/use_cases/test.c')
+        test_prog.depends_on(util)
+
+        main_prog.build(op_clang)
+        test_prog.build(clang)
+
+        self.assertTrue(os.path.isfile(main_out))
+        self.assertTrue(os.path.isfile(test_out))
 
 if __name__ == '__main__':
     make_dirs()
