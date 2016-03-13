@@ -15,7 +15,7 @@ class TestBasic(unittest.TestCase):
     def setUp(self):
         # clean
         bin_ = TEST_FILES_DIR + 'bin/'
-        out_ = TEST_FILES_DIR + 'out/'
+        out_ = TEST_FILES_DIR + 'obj/'
         for root, _, files in os.walk(bin_):
             for filename in files:
                 if filename[0] != '.':
@@ -75,7 +75,7 @@ class TestDirs(unittest.TestCase):
     def setUp(self):
         # clean
         bin_ = TEST_FILES_DIR + 'bin/'
-        out_ = TEST_FILES_DIR + 'out/'
+        out_ = TEST_FILES_DIR + 'obj/'
         for root, _, files in os.walk(bin_):
             for filename in files:
                 if filename[0] != '.':
@@ -87,10 +87,10 @@ class TestDirs(unittest.TestCase):
                     os.remove(os.path.join(root, filename))
 
     def test_single_dir(self):
-        out_file = TEST_FILES_DIR + 'out/dir1/a.o'
-        path = TEST_FILES_DIR + 'src/dir1'
+        out_file = TEST_FILES_DIR + 'obj/dir1/a.o'
+        path = TEST_FILES_DIR + 'src/dir1/'
         dir1 = snake.Dir(path)
-        dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'out/dir1/*.o')
+        dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'obj/dir1/*.o')
         my_tool = snake.Tool("gcc {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
