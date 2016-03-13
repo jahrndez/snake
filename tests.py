@@ -5,15 +5,30 @@ import os
 TEST_FILES_DIR = 'test_files/'
 
 
+def remove_files(prefix, files):
+    for filename in files:
+        if filename[0] != '.':
+            os.remove(os.path.join(prefix, filename))
+
+
 class TestBasic(unittest.TestCase):
     def setUp(self):
         # clean
-        bin = TEST_FILES_DIR + 'bin/'
-        for root, dirs, files in os.walk(bin):
+        bin_ = TEST_FILES_DIR + 'bin/'
+        out_ = TEST_FILES_DIR + 'out/'
+        for root, _, files in os.walk(bin_):
             for filename in files:
                 if filename[0] != '.':
                     try:
-                        os.remove(os.path.join(bin, filename))
+                        os.remove(os.path.join(root, filename))
+                    except:
+                        pass
+
+        for root, _, files in os.walk(out_):
+            for filename in files:
+                if filename[0] != '.':
+                    try:
+                        os.remove(os.path.join(root, filename))
                     except:
                         pass
 
@@ -45,17 +60,6 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
-    def test_single_folder_deps_single_file(self):
-        out_file = TEST_FILES_DIR + 'bin/dir1/a.o'
-        path = TEST_FILES_DIR + 'src/dir1'
-        dir1 = snake.Dir(path,True)
-        dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'bin/dir1/*.o')
-        dir1.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
-        dir1.tool(my_tool)
-        dir1.build()
-        self.assertTrue(os.path.isfile(out_file))
-
     def test_flags_no_placeholder(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
         target = snake.Target(out_file)
@@ -66,7 +70,31 @@ class TestBasic(unittest.TestCase):
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
-    def test_single_folder_deps_single_folder(self):
+
+class TestDirs(unittest.TestCase):
+    def setUp(self):
+        # clean
+        bin_ = TEST_FILES_DIR + 'bin/'
+        out_ = TEST_FILES_DIR + 'out/'
+        for root, _, files in os.walk(bin_):
+            for filename in files:
+                if filename[0] != '.':
+                    os.remove(os.path.join(root, filename))
+
+        for root, _, files in os.walk(out_):
+            for filename in files:
+                if filename[0] != '.':
+                    os.remove(os.path.join(root, filename))
+
+    def test_single_dir(self):
+        out_file = TEST_FILES_DIR + 'out/dir1/a.o'
+        path = TEST_FILES_DIR + 'src/dir1'
+        dir1 = snake.Dir(path)
+        dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'out/dir1/*.o')
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        dir1.tool(my_tool)
+        dir1.build()
+        self.assertTrue(os.path.isfile(out_file))
 
 if __name__ == '__main__':
     unittest.main()

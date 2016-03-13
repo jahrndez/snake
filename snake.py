@@ -4,7 +4,6 @@ import re
 import subprocess
 import __main__
 
-# ABS_PATH = os.path.realpath(__file__)
 ABS_DIR_PATH = os.path.realpath(os.path.dirname(__main__.__file__))
 
 
@@ -41,7 +40,7 @@ class Dir:
         """
         if "*" in out and "*" not in inp:
             raise Exception("In must have * if out has *")
-        self.maps.append({"in":inp.replace("*", "(.+)"), "out":out})
+        self.maps.append({"in": inp.replace("*", "(.+)"), "out": out})
 
     def depends_on(self, *deps):
         """Specifies the dependencies of this directory, i.e. its input in the
@@ -59,7 +58,9 @@ class Dir:
                 raise Exception('dependency must be one of: Target, Dir, or string')
 
     def tool(self, tool):
-        """Specify the build tool for this Dir."""
+        """Specify the build tool for this Dir.
+        :param tool: program with which to build files in this directory
+        """
         self._tool = tool
 
     def has_tool(self):
@@ -72,6 +73,7 @@ class Dir:
         """Build this directory with the specified tool. If no tool is specified
         here, a tool must have been previously specified by a call to tool().
         Only dependencies which are bound to an output will be built.
+        :param tool: program with which to build the files in this directory
         """
         if tool:
             self._tool = tool
@@ -113,7 +115,7 @@ class Dir:
 
 class Leaf:
     """Wrapper class for files"""
-    #pylint: disable=missing-docstring,no-self-use
+    # pylint: disable=missing-docstring,no-self-use
 
     def __init__(self, filename):
         self.filename = filename
@@ -131,7 +133,7 @@ class Target:
     def __init__(self, out=None, deps=(), tool=None):
         """Constructs a new target object, with an output optionally specified.
         """
-        if out == None or out[0] == "/":
+        if out is None or out[0] == "/":
             self._out = out
         else:
             self._out = os.path.join(ABS_DIR_PATH, out)
