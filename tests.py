@@ -16,15 +16,15 @@ class TestBasic(unittest.TestCase):
         # clean
         bin_ = TEST_FILES_DIR + 'bin/'
         out_ = TEST_FILES_DIR + 'out/'
-        for root, dirs, files in os.walk(bin_):
+        for root, _, files in os.walk(bin_):
             for filename in files:
                 if filename[0] != '.':
-                    os.remove(os.path.join(bin_, filename))
+                    os.remove(os.path.join(root, filename))
 
-        for root, dirs, files in os.walk(out_):
+        for root, _, files in os.walk(out_):
             for filename in files:
                 if filename[0] != '.':
-                    os.remove(os.path.join(out_, filename))
+                    os.remove(os.path.join(root, filename))
 
     def test_single_c_file(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
@@ -70,22 +70,21 @@ class TestDirs(unittest.TestCase):
         # clean
         bin_ = TEST_FILES_DIR + 'bin/'
         out_ = TEST_FILES_DIR + 'out/'
-        for root, dirs, files in os.walk(bin_):
+        for root, _, files in os.walk(bin_):
             for filename in files:
                 if filename[0] != '.':
-                    os.remove(os.path.join(bin_, filename))
+                    os.remove(os.path.join(root, filename))
 
-        for root, dirs, files in os.walk(out_):
+        for root, _, files in os.walk(out_):
             for filename in files:
                 if filename[0] != '.':
-                    os.remove(os.path.join(out_, filename))
+                    os.remove(os.path.join(root, filename))
 
-    def test_single_folder_depends_single_folder(self):
-        out_file = TEST_FILES_DIR + 'bin/dir1/a.o'
+    def test_single_dir(self):
+        out_file = TEST_FILES_DIR + 'out/dir1/a.o'
         path = TEST_FILES_DIR + 'src/dir1'
-        dir1 = snake.Dir(path,True)
-        dir1.map('*.c', '*.o')
-        dir1.depends_on(TEST_FILES_DIR + 'src/basic.c')
+        dir1 = snake.Dir(path)
+        dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'out/dir1/*.o')
         my_tool = snake.Tool("gcc {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
