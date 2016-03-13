@@ -139,7 +139,7 @@ class Target:
         self._tool = None
 
         # Handle short-cut optional args
-        self.depends_on(deps)
+        self.depends_on(*deps)
         self.tool(tool)
 
     def out(self, out):
