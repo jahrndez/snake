@@ -133,13 +133,13 @@ class Leaf:
     # pylint: disable=missing-docstring,no-self-use
 
     def __init__(self, filename):
-        self.filename = filename
+        self._out = filename
 
     def has_tool(self):
         return True
 
     def build(self):
-        return self.filename
+        return self._out
 
 
 class Target:
@@ -208,19 +208,23 @@ class Target:
         if self._tool is None:
             raise Exception('no tool specified for target')
 
+        run_command = False
+        if not os.path.exists(self._out):
+            run_command = True
+        if not run_command and not all(os.path.exists(dep._out) for dep in self.dependencies):
+            run_command = True
+
         ins = [dep.build() if dep.has_tool() else dep.build(self._tool)
                for dep in self.dependencies]
 
+        if not run_command and any(os.path.getmtime(dep) > os.path.getmtime(self._out) for dep in ins):
+            run_command = True
         ins = flatten(ins)
         command = self._tool.command()
         in_string = " ".join(ins)
-
         command = command.format(inp=in_string, out=self._out)
-
-        # try:
-        subprocess.check_call(command.split(" "))
-        # except subprocess.CalledProcessError:
-        #     raise Exception('build failed')
+        if run_command:
+            subprocess.check_call(command.split(" "))
 
         return self._out
 
