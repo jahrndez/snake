@@ -49,7 +49,7 @@ class TestBasic(unittest.TestCase):
         out_file = TEST_FILES_DIR + 'bin/basic'
         target = snake.Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c', TEST_FILES_DIR + 'src/basic2.c')
-        my_tool = snake.Tool("gcc -c {inp} -o {out}")
+        my_tool = snake.Tool("gcc {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
