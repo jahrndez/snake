@@ -87,7 +87,7 @@ class TestDirs(unittest.TestCase):
         clean()
 
     def test_single_dir(self):
-        out_file = TEST_FILES_DIR + 'obj/dir1/c.o'
+        out_file = TEST_FILES_DIR + 'obj/dir1/a.o'
         path = TEST_FILES_DIR + 'src/dir1/'
         dir1 = snake.Dir(path)
         dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'obj/dir1/*.o')
@@ -97,16 +97,64 @@ class TestDirs(unittest.TestCase):
         self.assertTrue(os.path.isfile(out_file))
 
     def test_single_dir_deps_single_file(self):
-        pass
+        out_file = TEST_FILES_DIR + 'obj/dir2/a.o'
+        path = TEST_FILES_DIR + 'src/dir2/'
+        dir1 = snake.Dir(path)
+        dir1.map(TEST_FILES_DIR + 'src/dir2/*.c', TEST_FILES_DIR + 'obj/dir2/*.o')
+        dir1.depends_on(TEST_FILES_DIR + 'src/basic2.c')
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        dir1.tool(my_tool)
+        dir1.build()
+        self.assertTrue(os.path.isfile(out_file))
 
     def test_single_dir_deps_single_dir(self):
-        pass
+        out_file = TEST_FILES_DIR + 'obj/dir3/f1/a.o'
+        path1 = TEST_FILES_DIR + 'src/dir3/f1'
+        dir1 = snake.Dir(path1)
+        dir1.map(TEST_FILES_DIR + 'src/dir3/f1/*.c', TEST_FILES_DIR + 'obj/dir3/f1/*.o')
+
+        path2 = TEST_FILES_DIR + 'src/dir3/f2'
+        dir2 = snake.Dir(path2)
+
+        dir1.depends_on(dir2)
+
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        dir1.tool(my_tool)
+        dir1.build()
+        self.assertTrue(os.path.isfile(out_file))
 
     def test_single_dir_deps_single_dir_and_file(self):
-        pass
+        out_file = TEST_FILES_DIR + 'obj/dir3/f1/a.o'
+        path1 = TEST_FILES_DIR + 'src/dir3/f1'
+        dir1 = snake.Dir(path1)
+        dir1.map(TEST_FILES_DIR + 'src/dir3/f1/*.c', TEST_FILES_DIR + 'obj/dir3/f1/*.o')
+
+        path2 = TEST_FILES_DIR + 'src/dir3/f2'
+        dir2 = snake.Dir(path2)
+
+        dir1.depends_on(dir2)
+        dir1.depends_on(TEST_FILES_DIR + 'src/basic2.c')
+
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        dir1.tool(my_tool)
+        dir1.build()
+        self.assertTrue(os.path.isfile(out_file))
 
     def test_single_file_deps_single_dir_and_file(self):
-        pass
+        out_file = TEST_FILES_DIR + 'bin/basic'
+        target = snake.Target(out_file)
+        target.depends_on(TEST_FILES_DIR + 'src/basic.c')
+
+        path2 = TEST_FILES_DIR + 'src/dir3/f2'
+        dir2 = snake.Dir(path2)
+
+        target.depends_on(dir2)
+        target.depends_on(TEST_FILES_DIR + 'src/basic2.c')
+
+        my_tool = snake.Tool("gcc {inp} -o {out}")
+        target.tool(my_tool)
+        target.build()
+        self.assertTrue(os.path.isfile(out_file))
 
 
 class TestUseCases(unittest.TestCase):
