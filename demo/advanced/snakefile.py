@@ -2,15 +2,14 @@
 import snake
 import sys
 
-# Regular gcc
-clang = snake.Tool("gcc {inp} -o {out}")
-clang.flags("-v")
-# -O3 Optimized gcc
-op_clang = snake.Tool("gcc {inp} -o {out}")
-op_clang.flags("-O3", "-v")
+# Main GCC
+gcc = snake.Tool("gcc {inp} -o {out}")
+# Object gcc
+obj_gcc = snake.Tool("gcc -c {inp} -o {out}")
 
 # Util directory
 util = snake.Dir('src/util')
+util.tool(obj_gcc)
 util.map('src/util/*.c', 'obj/util/*.o')
 
 # Main exectuable
@@ -25,8 +24,12 @@ test_prog.depends_on('src/test.c', util)
 
 # Command line options
 if len(sys.argv) == 1 or sys.argv[1] == 'main':
-    main_prog.build(op_clang)
+    gcc.flags("-v -O3")
+    obj_gcc.flags("-v -O3")
+    main_prog.build(gcc)
 elif sys.argv[1] == 'test':
-    test_prog.build(clang)
+    gcc.flags("-v")
+    obj_gcc.flags("-v")
+    test_prog.build(gcc)
 else:
     print("No such target '{}'".format(sys.argv[1]))
