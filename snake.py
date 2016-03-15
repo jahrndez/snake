@@ -19,8 +19,8 @@ def flatten(lst):
 
 def all_exist(dep):
     if isinstance(dep, list):
-        return all(os.path.exists(d._out) for d in dep)
-    return os.path.exists(dep._out)
+        return all(os.path.exists(path) for path in dep)
+    return os.path.exists(dep)
 
 class Dir:
     """A helpful wrapper around a group of files in a common directory."""
@@ -131,7 +131,7 @@ class Dir:
                     contents.append(os.path.join(dirname, filename))
         return contents
 
-    @_out.field
+    @property
     def _out(self):
         # contents = scan dir
         contents = self._get_files()
