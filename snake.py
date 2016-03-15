@@ -17,6 +17,10 @@ def flatten(lst):
 
     return res
 
+def all_exist(dep):
+    if isinstance(dep, list):
+        return all(os.path.exists(d._out) for d in dep)
+    return os.path.exists(dep._out)
 
 class Dir:
     """A helpful wrapper around a group of files in a common directory."""
@@ -127,6 +131,24 @@ class Dir:
                     contents.append(os.path.join(dirname, filename))
         return contents
 
+    @_out.field
+    def _out(self):
+        # contents = scan dir
+        contents = self._get_files()
+        # contents[i] = Target if contents[i] matches a mapping
+        for mapping in self.maps:
+            for i in range(len(contents)):
+                matches = re.search(mapping["in"], contents[i])
+                if matches:
+                    contents[i] = Target(mapping['out'].replace("*", matches.group(1)), deps=[contents[i]])
+
+        for i in range(len(contents)):
+            # everything that is not a Target becomes a Leaf
+            if not isinstance(contents[i], Target):
+                contents[i] = Leaf(contents[i])
+
+        return [res._out for res in contents]
+
 
 class Leaf:
     """Wrapper class for files"""
@@ -211,7 +233,7 @@ class Target:
         run_command = False
         if not os.path.exists(self._out):
             run_command = True
-        if not run_command and not all(os.path.exists(dep._out) for dep in self.dependencies):
+        if not run_command and not all(all_exist(dep._out) for dep in self.dependencies):
             run_command = True
 
         ins = [dep.build() if dep.has_tool() else dep.build(self._tool)
