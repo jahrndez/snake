@@ -1,26 +1,23 @@
 
-import snake
+from snake import Target, Dir, Tool
 import sys
 
 # Main GCC
-gcc = snake.Tool("gcc {inp} -o {out}")
+gcc = Tool("gcc {inp} -o {out}")
 # Object gcc
-obj_gcc = snake.Tool("gcc -c {inp} -o {out}")
+obj_gcc = Tool("gcc -c {inp} -o {out}")
 
 # Util directory
-util = snake.Dir('src/util')
-util.tool(obj_gcc)
+util = Dir('src/util', tool=obj_gcc)
 util.map('src/util/*.c', 'obj/util/*.o')
 
 # Main exectuable
 main_out = 'bin/main'
-main_prog = snake.Target(main_out)
-main_prog.depends_on('src/main.c', util)
+main_prog = Target(main_out, deps=['src/main.c', util])
 
 # Test executable
 test_out = 'bin/test'
-test_prog = snake.Target(test_out)
-test_prog.depends_on('src/test.c', util)
+test_prog = Target(test_out, deps=['src/test.c', util])
 
 # Command line options
 if len(sys.argv) == 1 or sys.argv[1] == 'main':
