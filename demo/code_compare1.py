@@ -1,6 +1,7 @@
 from snake import Target, Dir, Tool
 
-warns = ['-W', '-Wall', '-pedantic', '-Wno-comment', '-Wno-variadic-macros', '-Wno-unused-function']
+warns = ['-W', '-Wall', '-pedantic', '-Wno-comment',
+        '-Wno-variadic-macros', '-Wno-unused-function']
 v7_flags = ['-DCS_ENABLE_UTF8']
 cflags = warns + ['-g', '-O3', '-lm'] + v7_flags
 
