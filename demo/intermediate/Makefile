@@ -1,4 +1,5 @@
 FLAGS=-O3 -std=c11
+$(CC)=gcc
 
-a:
-		gcc example/a.c example/b.c $(FLAGS) -o example/a
+example/a: example/a.c example/b.c
+		$(CC) example/a.c example/b.c $(FLAGS) -o example/a
