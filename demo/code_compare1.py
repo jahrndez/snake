@@ -1,14 +1,11 @@
-WARNS = -W -Wall -pedantic -Wno-comment -Wno-variadic-macros -Wno-unused-function
-V7_FLAGS = -DCS_ENABLE_UTF8
-CFLAGS = $(WARNS) -g -O3 -lm $(V7_FLAGS) $(CFLAGS_PLATFORM) $(CFLAGS_EXTRA)
+from snake import Target, Dir, Tool
 
-.PHONY: examples test
+warns = ['-W', '-Wall', '-pedantic', '-Wno-comment',
+        '-Wno-variadic-macros', '-Wno-unused-function']
+v7_flags = ['-DCS_ENABLE_UTF8']
+cflags = warns + ['-g', '-O3', '-lm'] + v7_flags
 
-all: v7
+cc = Tool('gcc {inp} -o {out}', flags=['-DV7_EXE'] + cflags)
 
-v7: v7.c v7.h Makefile
-	$(CC) v7.c -o $@ -DV7_EXE $(CFLAGS) -lm
-
-clean:
-	@$(MAKE) -C examples clean
-	rm -fr v7 v7.dSYM tests/unit_test
+v7 = Target('v7', tool=cc, deps=['v7.c'])
+v7.build()

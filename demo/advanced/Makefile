@@ -10,8 +10,6 @@ UTIL_OBJS=$(patsubst src/util/%.c,obj/util/%.o,$(UTIL_SRCS))
 .PHONY : set_util_flags set_util_flags_opt
 
 main: set_util_flags_opt src/main.c $(UTIL_OBJS)
-	echo $(UTIL_SRCS)
-	echo $(UTIL_OBJS)
 	$(CC) $(FLAGS) $(OPTIMIZE_FLAGS) $(UTIL_OBJS) src/main.c -o bin/main
 
 test: set_util_flags src/test.c $(UTIL_OBJS)
