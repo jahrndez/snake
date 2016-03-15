@@ -1,5 +1,5 @@
 import unittest
-import snake
+from snake import Target, Tool, Dir
 import os
 
 TEST_FILES_DIR = 'test_files/'
@@ -42,27 +42,27 @@ class TestBasic(unittest.TestCase):
 
     def test_single_c_file(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
-        target = snake.Target(out_file)
+        target = Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc -c {inp} -o {out}")
+        my_tool = Tool("gcc -c {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
     def test_two_c_files(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
-        target = snake.Target(out_file)
+        target = Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c', TEST_FILES_DIR + 'src/basic2.c')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = Tool("gcc {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
 
     def test_basic_flags(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
-        target = snake.Target(out_file)
+        target = Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc -c {inp} {flags} {out}")
+        my_tool = Tool("gcc -c {inp} {flags} {out}")
         my_tool.flags("-o")
         target.tool(my_tool)
         target.build()
@@ -70,9 +70,9 @@ class TestBasic(unittest.TestCase):
 
     def test_flags_no_placeholder(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
-        target = snake.Target(out_file)
+        target = Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc -c {inp} -o {out}")
+        my_tool = Tool("gcc -c {inp} -o {out}")
         my_tool.flags("-Wall")
         target.tool(my_tool)
         target.build()
@@ -89,9 +89,9 @@ class TestDirs(unittest.TestCase):
     def test_single_dir(self):
         out_file = TEST_FILES_DIR + 'obj/dir1/a.o'
         path = TEST_FILES_DIR + 'src/dir1/'
-        dir1 = snake.Dir(path)
+        dir1 = Dir(path)
         dir1.map(TEST_FILES_DIR + 'src/dir1/*.c', TEST_FILES_DIR + 'obj/dir1/*.o')
-        my_tool = snake.Tool("gcc -c {inp} -o {out}")
+        my_tool = Tool("gcc -c {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
@@ -99,10 +99,10 @@ class TestDirs(unittest.TestCase):
     def test_single_dir_deps_single_file(self):
         out_file = TEST_FILES_DIR + 'obj/dir2/a.o'
         path = TEST_FILES_DIR + 'src/dir2/'
-        dir1 = snake.Dir(path)
+        dir1 = Dir(path)
         dir1.map(TEST_FILES_DIR + 'src/dir2/*.c', TEST_FILES_DIR + 'obj/dir2/*.o')
         dir1.depends_on(TEST_FILES_DIR + 'src/basic2.c')
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = Tool("gcc {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
@@ -110,15 +110,15 @@ class TestDirs(unittest.TestCase):
     def test_single_dir_deps_single_dir(self):
         out_file = TEST_FILES_DIR + 'obj/dir3/f1/a.o'
         path1 = TEST_FILES_DIR + 'src/dir3/f1'
-        dir1 = snake.Dir(path1)
+        dir1 = Dir(path1)
         dir1.map(TEST_FILES_DIR + 'src/dir3/f1/*.c', TEST_FILES_DIR + 'obj/dir3/f1/*.o')
 
         path2 = TEST_FILES_DIR + 'src/dir3/f2'
-        dir2 = snake.Dir(path2)
+        dir2 = Dir(path2)
 
         dir1.depends_on(dir2)
 
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = Tool("gcc {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
@@ -126,32 +126,32 @@ class TestDirs(unittest.TestCase):
     def test_single_dir_deps_single_dir_and_file(self):
         out_file = TEST_FILES_DIR + 'obj/dir3/f1/a.o'
         path1 = TEST_FILES_DIR + 'src/dir3/f1'
-        dir1 = snake.Dir(path1)
+        dir1 = Dir(path1)
         dir1.map(TEST_FILES_DIR + 'src/dir3/f1/*.c', TEST_FILES_DIR + 'obj/dir3/f1/*.o')
 
         path2 = TEST_FILES_DIR + 'src/dir3/f2'
-        dir2 = snake.Dir(path2)
+        dir2 = Dir(path2)
 
         dir1.depends_on(dir2)
         dir1.depends_on(TEST_FILES_DIR + 'src/basic2.c')
 
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = Tool("gcc {inp} -o {out}")
         dir1.tool(my_tool)
         dir1.build()
         self.assertTrue(os.path.isfile(out_file))
 
     def test_single_file_deps_single_dir_and_file(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
-        target = snake.Target(out_file)
+        target = Target(out_file)
         target.depends_on(TEST_FILES_DIR + 'src/basic.c')
 
         path2 = TEST_FILES_DIR + 'src/dir3/f2'
-        dir2 = snake.Dir(path2)
+        dir2 = Dir(path2)
 
         target.depends_on(dir2)
         target.depends_on(TEST_FILES_DIR + 'src/basic2.c')
 
-        my_tool = snake.Tool("gcc {inp} -o {out}")
+        my_tool = Tool("gcc {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
@@ -165,25 +165,20 @@ class TestUseCases(unittest.TestCase):
         clean()
 
     def test_advanced(self):
-        clang = snake.Tool("clang {inp} -o {out}")
+        clang = Tool("clang {inp} -o {out}")
         clang.flags("-v")
-        op_clang = snake.Tool("clang {inp} -o {out}")
+        op_clang = Tool("clang {inp} -o {out}")
         op_clang.flags("-O3", "-v")
-        util_clang = snake.Tool("clang -c {inp} -o {out}")
+        util_clang = Tool("clang -c {inp} -o {out}")
 
-        util = snake.Dir(TEST_FILES_DIR + 'src/use_cases/util')
+        util = Dir(TEST_FILES_DIR + 'src/use_cases/util', tool=util_clang)
         util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
-        util.tool(util_clang)
 
         main_out = TEST_FILES_DIR + 'bin/use_cases/main'
-        main_prog = snake.Target(main_out)
-        main_prog.depends_on(TEST_FILES_DIR + 'src/use_cases/main.c')
-        main_prog.depends_on(util)
+        main_prog = Target(main_out, deps=[TEST_FILES_DIR + 'src/use_cases/main.c', util])
 
         test_out = TEST_FILES_DIR + 'bin/use_cases/test'
-        test_prog = snake.Target(test_out)
-        test_prog.depends_on(TEST_FILES_DIR + 'src/use_cases/test.c')
-        test_prog.depends_on(util)
+        test_prog = Target(test_out, deps=[TEST_FILES_DIR + 'src/use_cases/test.c', util])
 
         main_prog.build(op_clang)
         test_prog.build(clang)
@@ -199,17 +194,51 @@ class TestMemoization(unittest.TestCase):
     def tearDown(self):
         clean()
 
-    def test_timestamp_memoization(self):
+    def test_do_not_rebuild(self):
         out_file = TEST_FILES_DIR + 'bin/basic'
-        target = snake.Target(out_file)
-        target.depends_on(TEST_FILES_DIR + 'src/basic.c')
-        my_tool = snake.Tool("gcc -c {inp} -o {out}")
+        target = Target(out_file, deps=[TEST_FILES_DIR + 'src/basic.c'])
+
+        my_tool = Tool("gcc -c {inp} -o {out}")
         target.tool(my_tool)
         target.build()
         self.assertTrue(os.path.isfile(out_file))
         time = os.path.getmtime(out_file)
         target.build()
         self.assertEqual(time, os.path.getmtime(out_file), "file was rebuilt")
+
+    def test_rebuild(self):
+        clang = Tool("clang {inp} -o {out}")
+        clang.flags("-v")
+        op_clang = Tool("clang {inp} -o {out}")
+        op_clang.flags("-O3", "-v")
+        util_clang = Tool("clang -c {inp} -o {out}")
+
+        util_out = TEST_FILES_DIR + 'src/use_cases/util'
+        util = Dir(util_out, tool=util_clang)
+        util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
+
+        main_out = TEST_FILES_DIR + 'bin/use_cases/main'
+        main_prog = Target(main_out, deps=[TEST_FILES_DIR + 'src/use_cases/main.c', util])
+
+        test_out = TEST_FILES_DIR + 'bin/use_cases/test'
+        test_prog = Target(test_out, deps=[TEST_FILES_DIR + 'src/use_cases/test.c', util])
+
+        main_prog.build(op_clang)
+        test_prog.build(clang)
+
+        self.assertTrue(os.path.isfile(main_out))
+        self.assertTrue(os.path.isfile(test_out))
+        original_time_util = os.path.getmtime(util_out)
+        original_time_main = os.path.getmtime(main_out)
+
+        f = open(TEST_FILES_DIR + 'src/use_cases/util/utility.c', 'a')
+        f.write('// foo\n')
+
+        main_prog.build()
+
+        self.assertNotEqual(original_time_util, os.path.getmtime(util_out), "util file wasn't rebuilt")
+        self.assertNotEqual(original_time_main, os.path.getmtime(main_out), "main file wasn't rebuilt")
+
 
 if __name__ == '__main__':
     make_dirs()
