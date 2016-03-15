@@ -1,6 +1,7 @@
 import unittest
 from snake import Target, Tool, Dir
 import os
+import time
 
 TEST_FILES_DIR = 'test_files/'
 
@@ -213,8 +214,9 @@ class TestMemoization(unittest.TestCase):
         op_gcc.flags("-O3", "-v")
         util_gcc = Tool("gcc -c {inp} -o {out}")
 
-        util_out = TEST_FILES_DIR + 'src/use_cases/util'
-        util = Dir(util_out, tool=util_gcc)
+        util_out = TEST_FILES_DIR + 'obj/use_cases/util/utility.o'
+        util_dir = TEST_FILES_DIR + 'src/use_cases/util'
+        util = Dir(util_dir, tool=util_gcc)
         util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
 
         main_out = TEST_FILES_DIR + 'bin/use_cases/main'
@@ -228,16 +230,30 @@ class TestMemoization(unittest.TestCase):
 
         self.assertTrue(os.path.isfile(main_out))
         self.assertTrue(os.path.isfile(test_out))
+        original_time_util_in = os.path.getmtime(TEST_FILES_DIR + 'src/use_cases/util/utility.c')
         original_time_util = os.path.getmtime(util_out)
         original_time_main = os.path.getmtime(main_out)
 
-        f = open(TEST_FILES_DIR + 'src/use_cases/util/utility.c', 'a')
-        f.write('// foo\n')
+        time.sleep(2)
+
+        f = open(TEST_FILES_DIR + 'src/use_cases/util/utility.c', 'r')
+        lines = f.readlines()
+        f.close()
+        f = open(TEST_FILES_DIR + 'src/use_cases/util/utility.c', 'w')
+        for line in lines:
+            f.write(line)
+
+        f.close()
 
         main_prog.build()
 
-        self.assertNotEqual(original_time_util, os.path.getmtime(util_out), "util file wasn't rebuilt")
-        self.assertNotEqual(original_time_main, os.path.getmtime(main_out), "main file wasn't rebuilt")
+        updated_time_util_in = os.path.getmtime(TEST_FILES_DIR + 'src/use_cases/util/utility.c')
+        updated_time_util = os.path.getmtime(util_out)
+        updated_time_main = os.path.getmtime(main_out)
+
+        self.assertNotEqual(original_time_util_in, updated_time_util_in, "utility.c wasn't rebuilt")
+        self.assertNotEqual(original_time_util, updated_time_util, "utility.o file wasn't rebuilt")
+        self.assertNotEqual(original_time_main, updated_time_main, "main executable wasn't rebuilt")
 
 
 if __name__ == '__main__':
