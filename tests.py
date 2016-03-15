@@ -165,13 +165,13 @@ class TestUseCases(unittest.TestCase):
         clean()
 
     def test_advanced(self):
-        clang = Tool("clang {inp} -o {out}")
-        clang.flags("-v")
-        op_clang = Tool("clang {inp} -o {out}")
-        op_clang.flags("-O3", "-v")
-        util_clang = Tool("clang -c {inp} -o {out}")
+        gcc = Tool("gcc {inp} -o {out}")
+        gcc.flags("-v")
+        op_gcc = Tool("gcc {inp} -o {out}")
+        op_gcc.flags("-O3", "-v")
+        util_gcc = Tool("gcc -c {inp} -o {out}")
 
-        util = Dir(TEST_FILES_DIR + 'src/use_cases/util', tool=util_clang)
+        util = Dir(TEST_FILES_DIR + 'src/use_cases/util', tool=util_gcc)
         util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
 
         main_out = TEST_FILES_DIR + 'bin/use_cases/main'
@@ -180,8 +180,8 @@ class TestUseCases(unittest.TestCase):
         test_out = TEST_FILES_DIR + 'bin/use_cases/test'
         test_prog = Target(test_out, deps=[TEST_FILES_DIR + 'src/use_cases/test.c', util])
 
-        main_prog.build(op_clang)
-        test_prog.build(clang)
+        main_prog.build(op_gcc)
+        test_prog.build(gcc)
 
         self.assertTrue(os.path.isfile(main_out))
         self.assertTrue(os.path.isfile(test_out))
@@ -207,14 +207,14 @@ class TestMemoization(unittest.TestCase):
         self.assertEqual(time, os.path.getmtime(out_file), "file was rebuilt")
 
     def test_rebuild(self):
-        clang = Tool("clang {inp} -o {out}")
-        clang.flags("-v")
-        op_clang = Tool("clang {inp} -o {out}")
-        op_clang.flags("-O3", "-v")
-        util_clang = Tool("clang -c {inp} -o {out}")
+        gcc = Tool("gcc {inp} -o {out}")
+        gcc.flags("-v")
+        op_gcc = Tool("gcc {inp} -o {out}")
+        op_gcc.flags("-O3", "-v")
+        util_gcc = Tool("gcc -c {inp} -o {out}")
 
         util_out = TEST_FILES_DIR + 'src/use_cases/util'
-        util = Dir(util_out, tool=util_clang)
+        util = Dir(util_out, tool=util_gcc)
         util.map(TEST_FILES_DIR + 'src/use_cases/util/*.c', TEST_FILES_DIR + 'obj/use_cases/util/*.o')
 
         main_out = TEST_FILES_DIR + 'bin/use_cases/main'
@@ -223,8 +223,8 @@ class TestMemoization(unittest.TestCase):
         test_out = TEST_FILES_DIR + 'bin/use_cases/test'
         test_prog = Target(test_out, deps=[TEST_FILES_DIR + 'src/use_cases/test.c', util])
 
-        main_prog.build(op_clang)
-        test_prog.build(clang)
+        main_prog.build(op_gcc)
+        test_prog.build(gcc)
 
         self.assertTrue(os.path.isfile(main_out))
         self.assertTrue(os.path.isfile(test_out))

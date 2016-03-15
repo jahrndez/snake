@@ -22,6 +22,11 @@ def all_exist(dep):
         return all(os.path.exists(path) for path in dep)
     return os.path.exists(dep)
 
+def any_newer(dep, me):
+    if isinstance(dep, list):
+        return any(os.path.getmtime(path) > os.path.getmtime(me) for path in dep)
+    return os.path.getmtime(dep) > os.path.getmtime(me)
+
 class Dir:
     """A helpful wrapper around a group of files in a common directory."""
     def __init__(self, dirname, recursive=False, tool=None, deps=()):
@@ -239,7 +244,7 @@ class Target:
         ins = [dep.build() if dep.has_tool() else dep.build(self._tool)
                for dep in self.dependencies]
 
-        if not run_command and any(os.path.getmtime(dep) > os.path.getmtime(self._out) for dep in ins):
+        if not run_command and any(any_newer(dep, self._out) for dep in ins):
             run_command = True
         ins = flatten(ins)
         command = self._tool.command()
