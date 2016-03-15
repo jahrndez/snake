@@ -17,19 +17,22 @@ def flatten(lst):
 
     return res
 
+
 def all_exist(dep):
     if isinstance(dep, list):
         return all(os.path.exists(path) for path in dep)
     return os.path.exists(dep)
+
 
 def any_newer(dep, me):
     if isinstance(dep, list):
         return any(os.path.getmtime(path) > os.path.getmtime(me) for path in dep)
     return os.path.getmtime(dep) > os.path.getmtime(me)
 
+
 class Dir:
     """A helpful wrapper around a group of files in a common directory."""
-    def __init__(self, dirname, recursive=False, tool=None, deps=()):
+    def __init__(self, dir_name, recursive=False, tool=None, deps=()):
         """Constructs a directory target from the specified dirname. Every
         file in the directory is then treated as a dependency. The optional
         recursive specifies whether any directories within this directory
@@ -39,10 +42,10 @@ class Dir:
 
         # allow for full-paths to be used if they start with '/'
         self.recursive = recursive
-        if dirname[0] == "/":
-            self.path = dirname
+        if dir_name[0] == "/":
+            self.path = dir_name
         else:
-            self.path = os.path.join(ABS_DIR_PATH, dirname)
+            self.path = os.path.join(ABS_DIR_PATH, dir_name)
         if not os.path.isdir(self.path):
             raise Exception('specified directory does not exist')
 
@@ -61,6 +64,8 @@ class Dir:
         the output of all the input files matched by in. out must have the same
         number of wildcards as in (0 or 1). Only dependencies of this directory
         which are matched by a call to map() will be built on build()
+        :param inp: binding input
+        :param out: binding output
         """
         if "*" in out and "*" not in inp:
             raise Exception("In must have * if out has *")
