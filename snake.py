@@ -1,4 +1,10 @@
-"""Snake Build Library."""
+"""Snake Build Library.
+
+    Alex Hernandez
+    Jacob Estelle
+    Jinxing Wang
+
+"""
 import os
 import re
 import subprocess
